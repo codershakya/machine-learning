@@ -12,7 +12,7 @@ function [J grad] = nnCostFunction(nn_params, ...
 % 
 %   The returned parameter grad should be a "unrolled" vector of the
 %   partial derivatives of the neural network.
-%
+
 
 % Reshape nn_params back into the parameters Theta1 and Theta2, the weight matrices
 % for our 2 layer neural network
@@ -62,13 +62,72 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+a1 = [ones(m, 1) X];
+
+
+z2 = a1 * Theta1';
+
+a2 = sigmoid(z2);
+
+a2  = [ones(m,1) a2];
+
+z3 = a2 * Theta2';
+
+
+a3 = sigmoid(z3);
+
+
+A = eye(num_labels);
+y_matrix = A(y,:);
+
+% Using these values of a and b for regularization in gradient
+a = Theta1;
+b = Theta2;
+
+% Cost Computation by element wise matrix multiplication
+Theta1(:,[1]) = []; 
+Theta2(:,[1]) = []; 
+
+
+reg1 = sum(sum(Theta1 .* Theta1));
+reg2 = sum(sum(Theta2 .* Theta2));
+reg = reg1 + reg2;
+reg = (reg*lambda)/(2*m);
+
+s = sum(sum(((-y_matrix) .* log(a3)) - ((1 - y_matrix) .* log(1-a3))));
+s = s  ; 
+%con2 = (1 - y_matrix) .* log(1-a3);
+
+%s = sum(con1 - con2);
+k = 1/m;
+
+J = k*s + reg ;
 
 
 
+% Back Propagation
 
+d3 = a3 - y_matrix;
 
+sgradient = sigmoidGradient(z2);
+%Theta2_wo_1 = Theta2(:,2:end);              % Theta2 without 1st columns
 
+d2  = (d3 * Theta2   ) .* sgradient ;
 
+delta1 = d2' * a1;
+delta2 = d3' * a2;
+
+Theta1_grad = delta1 / m;
+Theta2_grad = delta2 / m;
+
+a(:,1) = 0;
+b(:,1) = 0;
+
+a = a*lambda/m;
+b = b*lambda/m;
+
+Theta1_grad = Theta1_grad + a;
+Theta2_grad = Theta2_grad + b; 
 
 
 

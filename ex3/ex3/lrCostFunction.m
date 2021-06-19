@@ -39,7 +39,6 @@ grad = zeros(size(theta));
 
 z = X * theta;
 h = sigmoid(z);
-
 con1 = (-y) .* log(h);
 con2 = (1-y) .* log(1-h);
 
